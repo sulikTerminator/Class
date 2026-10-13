@@ -1,0 +1,68 @@
+#ifndef USER_H
+#define USER_H
+
+#include <string>
+#include <vector>
+#include "Friend.h"
+#include "Photo.h"
+#include "Video.h"
+
+// User — представляет Пользователя.
+// Роль: отправляет и получает сообщения, взаимодействует с друзьями.
+class User {
+private:
+    std::string userId;
+    std::string username;
+    std::string email;
+    std::string password;
+    std::string avatarUrl;
+    bool isAuthorized;
+
+    std::vector<Friend> friends;   // приватный круг (макс. 40)
+    int maxFriends = 40;           // лимит друзей
+
+    // Счётчики для генерации ID
+    int photoCounter = 0;
+    int videoCounter = 0;
+
+public:
+    User() = default;
+    User(const std::string& id, const std::string& name,
+         const std::string& mail, const std::string& avatar)
+        : userId(id), username(name), email(mail),
+          avatarUrl(avatar), isAuthorized(false) {}
+
+    // --- Авторизация ---
+    bool login(const std::string& login, const std::string& pass);
+    void logout();
+
+    // --- Взаимодействие с друзьями ---
+    bool addFriend(const Friend& friendUser);
+    bool removeFriend(const std::string& friendId);
+    std::vector<Friend> getFriends() const;
+    bool isFriendLimitReached() const;
+    int getFriendsCount() const { return static_cast<int>(friends.size()); }
+
+    // --- Отправка сообщений ---
+    Photo sendPhoto(const std::string& photoUrl, const Friend& recipient);
+    Photo sendPhotoWithMusic(const std::string& photoUrl,
+                             const std::string& trackId,
+                             const Friend& recipient);
+    Video sendVideo(const std::string& videoUrl, int duration,
+                    const Friend& recipient);
+    Video sendLipSync(const std::string& videoUrl, int duration,
+                      const std::string& trackId,
+                      const Friend& recipient);
+
+    // --- Получение сообщений ---
+    void receiveMessage(const std::string& messageId);
+
+    // --- Геттеры ---
+    std::string getUserId() const { return userId; }
+    std::string getUsername() const { return username; }
+    std::string getEmail() const { return email; }
+    std::string getAvatarUrl() const { return avatarUrl; }
+    bool getIsAuthorized() const { return isAuthorized; }
+};
+
+#endif // USER_H
