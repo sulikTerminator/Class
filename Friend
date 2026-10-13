@@ -1,0 +1,42 @@
+#ifndef FRIEND_H
+#define FRIEND_H
+
+#include <string>
+
+// Friend — представляет Друга.
+// Роль: пользователь из приватного круга (макс. 40).
+class Friend {
+private:
+    std::string friendId;
+    std::string username;
+    std::string avatarUrl;
+    std::string addedAt;
+    bool isBlocked;
+
+public:
+    Friend() = default;
+    Friend(const std::string& id, const std::string& name,
+           const std::string& avatar, const std::string& date)
+        : friendId(id), username(name), avatarUrl(avatar),
+          addedAt(date), isBlocked(false) {}
+
+    // --- Геттеры ---
+    std::string getUserId() const { return friendId; }
+    std::string getUsername() const { return username; }
+    std::string getAvatarUrl() const { return avatarUrl; }
+    std::string getAddedAt() const { return addedAt; }
+    bool getIsBlocked() const { return isBlocked; }
+
+    // --- Действия ---
+    void block() {
+        isBlocked = true;
+    }
+    void unblock() {
+        isBlocked = false;
+    }
+    void receiveMessage(const std::string& messageId) {
+        // приём сообщения от пользователя
+    }
+};
+
+#endif // FRIEND_H 
