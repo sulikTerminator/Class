@@ -1,0 +1,49 @@
+#ifndef VIDEO_H
+#define VIDEO_H
+
+#include <string>
+#include <ctime>
+
+// Video — представляет Видео.
+// Может быть обычным или липсингом (подпевание под трек).
+class Video {
+private:
+    std::string videoId;
+    std::string url;          // путь к файлу видео
+    std::string senderId;     // кто отправил
+    int duration;             // длительность в секундах
+    bool isLipSync;           // липсинг ли это
+    std::string trackId;      // ID трека (если липсинг)
+    std::time_t timestamp;
+
+public:
+    Video() = default;
+    Video(const std::string& id, const std::string& videoUrl,
+          const std::string& sender, int dur)
+        : videoId(id), url(videoUrl), senderId(sender),
+          duration(dur), isLipSync(false), timestamp(std::time(nullptr)) {}
+
+    // --- Геттеры ---
+    std::string getVideoId() const { return videoId; }
+    std::string getUrl() const { return url; }
+    std::string getSenderId() const { return senderId; }
+    int getDuration() const { return duration; }
+    bool getIsLipSync() const { return isLipSync; }
+    std::string getTrackId() const { return trackId; }
+    std::time_t getTimestamp() const { return timestamp; }
+
+    // --- Действия ---
+    void enableLipSync(const std::string& track) {
+        isLipSync = true;
+        trackId = track;
+    }
+    void disableLipSync() {
+        isLipSync = false;
+        trackId.clear();
+    }
+    std::string getPreview() const {
+        return isLipSync ? "Липсинг" : "Видео";
+    }
+};
+
+#endif // VIDEO_H
