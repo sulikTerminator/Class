@@ -1,0 +1,47 @@
+#ifndef PHOTO_H
+#define PHOTO_H
+
+#include <string>
+#include <ctime>
+
+// Photo — представляет Фото.
+// Может быть обычным или с наложенной музыкой.
+class Photo {
+private:
+    std::string photoId;
+    std::string url;          // путь к файлу фото
+    std::string senderId;     // кто отправил
+    bool hasMusic;            // есть ли музыка
+    std::string trackId;      // ID трека (если есть музыка)
+    std::time_t timestamp;
+
+public:
+    Photo() = default;
+    Photo(const std::string& id, const std::string& photoUrl,
+          const std::string& sender)
+        : photoId(id), url(photoUrl), senderId(sender),
+          hasMusic(false), timestamp(std::time(nullptr)) {}
+
+    // --- Геттеры ---
+    std::string getPhotoId() const { return photoId; }
+    std::string getUrl() const { return url; }
+    std::string getSenderId() const { return senderId; }
+    bool getHasMusic() const { return hasMusic; }
+    std::string getTrackId() const { return trackId; }
+    std::time_t getTimestamp() const { return timestamp; }
+
+    // --- Действия ---
+    void applyMusic(const std::string& track) {
+        hasMusic = true;
+        trackId = track;
+    }
+    void removeMusic() {
+        hasMusic = false;
+        trackId.clear();
+    }
+    std::string getPreview() const {
+        return hasMusic ? "Фото + музыка" : "Фото";
+    }
+};
+
+#endif // PHOTO_H
