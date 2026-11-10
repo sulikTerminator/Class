@@ -1,47 +1,32 @@
-#ifndef PHOTO_H
-#define PHOTO_H
-
+#pragma once
 #include <string>
-#include <ctime>
 
-// Photo — представляет Фото.
-// Может быть обычным или с наложенной музыкой.
 class Photo {
 private:
-    std::string photoId;
-    std::string url;          // путь к файлу фото
-    std::string senderId;     // кто отправил
-    bool hasMusic;            // есть ли музыка
-    std::string trackId;      // ID трека (если есть музыка)
-    std::time_t timestamp;
+    int         photoId;
+    int         messageId;      // 0 — ещё не привязано
+    std::string url;
+    std::string thumbnailUrl;
+    int         width;
+    int         height;
+    long long   sizeBytes;
 
 public:
-    Photo() = default;
-    Photo(const std::string& id, const std::string& photoUrl,
-          const std::string& sender)
-        : photoId(id), url(photoUrl), senderId(sender),
-          hasMusic(false), timestamp(std::time(nullptr)) {}
+    Photo(int photoId,
+          const std::string& url,
+          const std::string& thumbnailUrl,
+          int width,
+          int height,
+          long long sizeBytes);
 
-    // --- Геттеры ---
-    std::string getPhotoId() const { return photoId; }
-    std::string getUrl() const { return url; }
-    std::string getSenderId() const { return senderId; }
-    bool getHasMusic() const { return hasMusic; }
-    std::string getTrackId() const { return trackId; }
-    std::time_t getTimestamp() const { return timestamp; }
+    int         getPhotoId()   const;
+    int         getMessageId() const;
+    std::string getUrl()       const;
+    std::string getThumbnail() const;
+    int         getWidth()     const;
+    int         getHeight()    const;
+    long long   getSizeBytes() const;
 
-    // --- Действия ---
-    void applyMusic(const std::string& track) {
-        hasMusic = true;
-        trackId = track;
-    }
-    void removeMusic() {
-        hasMusic = false;
-        trackId.clear();
-    }
-    std::string getPreview() const {
-        return hasMusic ? "Фото + музыка" : "Фото";
-    }
+    void bindToMessage(int messageId);
+    std::string getPreview() const;
 };
-
-#endif // PHOTO_H
