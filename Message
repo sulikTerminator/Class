@@ -1,0 +1,50 @@
+#pragma once
+#include <string>
+#include <vector>
+#include <ctime>
+#include "MessageType.h"
+#include "Photo.h"
+
+class Message {
+private:
+    int                messageId;
+    int                senderId;
+    int                receiverId;
+    std::string        text;
+    MessageType        type;
+    MessageStatus      status;
+    int                trackId;     // 0 — нет трека
+    int                duration;    // 0 — не видео
+    std::time_t        createdAt;
+    std::vector<Photo> photos;
+
+public:
+    Message(int messageId,
+            int senderId,
+            int receiverId,
+            MessageType type,
+            const std::string& text = "");
+
+    // Геттеры
+    int                getMessageId()  const;
+    int                getSenderId()   const;
+    int                getReceiverId() const;
+    std::string        getText()       const;
+    MessageType        getType()       const;
+    MessageStatus      getStatus()     const;
+    int                getTrackId()    const;
+    int                getDuration()   const;
+    const std::vector<Photo>& getPhotos() const;
+
+    // Изменение содержимого
+    void attachPhoto(const Photo& photo);
+    void applyMusic(int trackId);
+    void setDuration(int seconds);
+
+    // Статусы
+    void markAsDelivered();
+    void markAsRead();
+
+    // Превью
+    std::string getPreview() const;
+};
