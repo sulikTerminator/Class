@@ -1,0 +1,92 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+// --- Абстрактный класс ---
+class MediaContent {
+public:
+    string url;
+    MediaContent(const string& u) : url(u) {}
+    virtual ~MediaContent() {}
+    virtual string getType()    const = 0;   // чисто виртуальные
+    virtual string getPreview() const = 0;
+};
+
+// --- Наследники: Photo и Video ---
+class Photo : public MediaContent {
+public:
+    int width, height;
+    Photo(const string& u, int w, int h) : MediaContent(u), width(w), height(h) {}
+    string getType()    const override { return "photo"; }
+    string getPreview() const override { return "Photo " + to_string(width) + "x" + to_string(height); }
+};
+
+class Video : public MediaContent {
+public:
+    int  duration;
+    bool isLipSync;
+    Video(const string& u, int d, bool lip) : MediaContent(u), duration(d), isLipSync(lip) {}
+    string getType()    const override { return isLipSync ? "lipsync" : "video"; }
+    string getPreview() const override { return getType() + " " + to_string(duration) + "s"; }
+};
+
+// --- Message: агрегирует MediaContent ---
+class Message {
+public:
+    int    senderId, receiverId;
+    string text;
+    vector<MediaContent*> media;   // агрегация: сообщение владеет медиа
+
+    Message(int from, int to, const string& t) : senderId(from), receiverId(to), text(t) {}
+    ~Message() { for (auto m : media) delete m; }
+
+    void attach(MediaContent* m) { media.push_back(m); }
+
+    string getPreview() const {
+        if (media.empty()) return "[text] " + text;
+        return "[" + media.front()->getType() + "] " + media.front()->getPreview();
+    }
+};
+
+// --- User ---
+class User {
+public:
+    static const int MAX_FRIENDS = 40;
+    int    userId;
+    string username;
+    vector<int> friends;   // ассоциация User → User
+
+    User(int id, const string& n) : userId(id), username(n) {}
+
+    bool addFriend(int id) {
+        if (friends.size() >= MAX_FRIENDS) return false;
+        friends.push_back(id);
+        return true;
+    }
+
+    Message sendMessage(int to, const string& text = "") {
+        return Message(userId, to, text);   // ассоциация User → Message
+    }
+};
+
+// --- main ---
+int main() {
+    User alice(1, "alice"), bob(2, "bob");
+    alice.addFriend(bob.userId);
+
+    Message msg = alice.sendMessage(bob.userId, "Закат");
+
+    msg.attach(new Photo("/sunset.jpg", 1080, 1920));
+    msg.attach(new Video("/lipsync.mp4", 15, true));
+
+    cout << "=== Message preview ===\n" << msg.getPreview() << "\n\n";
+    cout << "=== All media (полиморфный обход) ===\n";
+    for (auto m : msg.media)
+        cout << "- [" << m->getType() << "] " << m->getPreview() << "\n";
+
+    cout << "\n=== Friends ===\n"
+        << alice.username << " friends: " << alice.friends.size()
+        << " / " << User::MAX_FRIENDS << "\n";
+    return 0;
+}
